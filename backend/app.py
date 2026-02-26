@@ -8,7 +8,7 @@ from doc_chain import answer_question
 
 
 app = FastAPI(
-    title="Doc Chat Backend",
+    title="PageChat Backend",
     version="0.1.0",
 )
 
@@ -41,7 +41,7 @@ def chat(request: ChatRequest) -> ChatResponse:
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     return ChatResponse(answer=answer)

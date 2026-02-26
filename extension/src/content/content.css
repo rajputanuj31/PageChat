@@ -1,0 +1,244 @@
+#doc-chat-extension-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+}
+
+.doc-chat-toggle {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  background: #f44336;
+  color: #ffffff;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.doc-chat-toggle:hover {
+  background: #e53935;
+}
+
+.doc-chat-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 88px;
+  width: min(380px, 100% - 32px);
+  max-height: min(70vh, 650px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.doc-chat-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.doc-chat-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.doc-chat-title-main {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.doc-chat-title-sub {
+  font-size: 11px;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 360px;
+}
+
+.doc-chat-body {
+  padding: 12px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 160px;
+  gap: 4px;
+}
+
+.doc-chat-main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.doc-chat-empty {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.doc-chat-msg {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.doc-chat-msg-label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2px;
+}
+
+.doc-chat-msg-content {
+  display: inline-block;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #f3f4f6;
+  max-width: 100%;
+  white-space: pre-wrap;
+}
+
+.doc-chat-msg--user .doc-chat-msg-content {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.doc-chat-msg--assistant .doc-chat-msg-content {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.doc-chat-msg--user {
+  justify-content: flex-end;
+}
+
+.doc-chat-msg--assistant {
+  justify-content: flex-start;
+}
+
+.doc-chat-loading {
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.doc-chat-error {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.doc-chat-error-text {
+  color: #b91c1c;
+}
+
+.doc-chat-error-link {
+  border-radius: 999px;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12px;
+  background: #f44336;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.doc-chat-error-link:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.doc-chat-suggestions {
+  margin-top: 8px;
+  align-self: flex-end;
+  text-align: right;
+}
+
+.doc-chat-suggestion-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 12px;
+  color: #1d95f6;
+  text-decoration: underline;
+  cursor: pointer;
+  display: block;
+}
+
+.doc-chat-suggestion-link:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.doc-chat-footer {
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.35);
+  background: #f9fafb;
+}
+
+.doc-chat-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.doc-chat-input {
+  flex: 1;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.doc-chat-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.5);
+}
+
+.doc-chat-send {
+  border-radius: 999px;
+  border: none;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #2563eb;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.doc-chat-send:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.doc-chat-send:not(:disabled):hover {
+  background: #1d4ed8;
+}
+

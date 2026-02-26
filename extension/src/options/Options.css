@@ -1,0 +1,116 @@
+.doc-options-root {
+  min-height: 100vh;
+  margin: 0;
+  padding: 40px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: radial-gradient(circle at top left, #26293b, #050509);
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+}
+
+.doc-options-card {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(5, 5, 9, 0.96);
+  border-radius: 16px;
+  padding: 24px 24px 20px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.doc-options-header h1 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+
+.doc-options-header p {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.doc-options-form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.doc-options-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.doc-options-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.doc-options-field input {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: #101019;
+  color: #ffffff;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.doc-options-field input:focus {
+  outline: none;
+  border-color: #f44336;
+  box-shadow: 0 0 0 1px rgba(244, 67, 54, 0.6);
+}
+
+.doc-options-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.doc-options-footer button {
+  border-radius: 999px;
+  border: none;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #f44336;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.doc-options-footer button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.doc-options-footer button:not(:disabled):hover {
+  background: #e53935;
+}
+
+.doc-options-status {
+  font-size: 12px;
+}
+
+.doc-options-status--ok {
+  color: #81c784;
+}
+
+.doc-options-status--error {
+  color: #e57373;
+}
+
+.doc-options-devnote {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.doc-options-devnote code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+}
+
