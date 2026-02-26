@@ -2,7 +2,6 @@ from typing import Optional
 
 from dotenv import load_dotenv
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
@@ -13,6 +12,7 @@ from langchain_core.runnables import (
 )
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.document_loaders import WebBaseLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 load_dotenv()
