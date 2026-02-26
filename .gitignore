@@ -1,0 +1,33 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+
+# Python (backend/)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.env.*
+
+# Node / Vite (extension/)
+node_modules/
+extension/node_modules/
+extension/dist/
+extension/.eslintcache
+extension/npm-debug.log*
+extension/yarn-debug.log*
+extension/yarn-error.log*
+extension/pnpm-debug.log*
+
+# TypeScript build info
+extension/node_modules/.tmp/
+
