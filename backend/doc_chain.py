@@ -1,6 +1,11 @@
+import os
 from typing import Optional
 
+import certifi
 from dotenv import load_dotenv
+
+os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+os.environ.setdefault("REQUESTS_CA_BUNDLE", certifi.where())
 
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS

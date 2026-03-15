@@ -9,7 +9,7 @@
     "192": "icon192.png"
   },
   "permissions": ["storage"],
-  "host_permissions": ["http://127.0.0.1:8000/*"],
+  "host_permissions": ["https://pagechat.onrender.com/*"],
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true

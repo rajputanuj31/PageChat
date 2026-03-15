@@ -1,10 +1,19 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
 
-// Vite config for the options page build.
+function stripCrossOrigin(): Plugin {
+  return {
+    name: 'strip-crossorigin',
+    enforce: 'post',
+    transformIndexHtml(html) {
+      return html.replace(/ crossorigin/g, '');
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), stripCrossOrigin()],
   build: {
     emptyOutDir: true,
     rollupOptions: {
@@ -12,7 +21,6 @@ export default defineConfig({
         options: resolve(__dirname, 'options.html'),
       },
       output: {
-        // Use hashed filenames for cache-busting on options assets.
         assetFileNames: 'assets/[name]-[hash][extname]',
         entryFileNames: 'assets/[name]-[hash].js',
       },

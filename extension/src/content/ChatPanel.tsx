@@ -113,7 +113,7 @@ export function ChatPanel() {
       const question = rawQuestion.trim();
       if (!question || !pageId) return;
 
-      const { backendUrl, apiKey } = settings ?? { backendUrl: '', apiKey: '' };
+      const { apiKey } = settings ?? { apiKey: '' };
       if (!apiKey.trim()) {
         setError('Please add your OpenAI API key in the extension options page.');
         return;
@@ -127,7 +127,6 @@ export function ChatPanel() {
 
       const pageContent = getPageContent();
       const result = await sendChat({
-        backendUrl,
         apiKey,
         url,
         question,

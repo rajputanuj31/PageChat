@@ -1,50 +1,32 @@
 import { useCallback, useEffect, useState } from 'react';
 
 const API_KEY_STORAGE_KEY = 'openai_api_key';
-const BACKEND_URL_STORAGE_KEY = 'backend_url';
-const DEFAULT_BACKEND_URL = 'http://127.0.0.1:8000';
 
 type Status = 'idle' | 'saving' | 'saved' | 'error';
-
-interface ChromeStorage {
-  apiKey: string;
-  backendUrl: string;
-}
 
 function isChromeStorageAvailable(): boolean {
   return typeof chrome !== 'undefined' && !!chrome.storage?.local;
 }
 
-async function readFromChrome(): Promise<ChromeStorage> {
+async function readApiKey(): Promise<string> {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get(
-      [API_KEY_STORAGE_KEY, BACKEND_URL_STORAGE_KEY],
+      [API_KEY_STORAGE_KEY],
       (items: Record<string, unknown>) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
           return;
         }
-
-        const apiKey = (items[API_KEY_STORAGE_KEY] as string | undefined) ?? '';
-        const backendUrlRaw =
-          (items[BACKEND_URL_STORAGE_KEY] as string | undefined) ?? DEFAULT_BACKEND_URL;
-        const backendUrl = backendUrlRaw.replace(/\/+$/, '');
-
-        resolve({ apiKey, backendUrl });
+        resolve((items[API_KEY_STORAGE_KEY] as string | undefined) ?? '');
       },
     );
   });
 }
 
-async function writeToChrome(apiKey: string, backendUrl: string): Promise<void> {
+async function writeApiKey(apiKey: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const normalizedBackendUrl = backendUrl.replace(/\/+$/, '');
-
     chrome.storage.local.set(
-      {
-        [API_KEY_STORAGE_KEY]: apiKey,
-        [BACKEND_URL_STORAGE_KEY]: normalizedBackendUrl,
-      },
+      { [API_KEY_STORAGE_KEY]: apiKey },
       () => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
@@ -58,7 +40,6 @@ async function writeToChrome(apiKey: string, backendUrl: string): Promise<void> 
 
 export function Options() {
   const [apiKey, setApiKey] = useState<string>('');
-  const [backendUrl, setBackendUrl] = useState<string>(DEFAULT_BACKEND_URL);
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
 
@@ -66,13 +47,9 @@ export function Options() {
 
   useEffect(() => {
     if (!usingChromeStorage) {
-      // Dev mode: try localStorage if available.
       try {
         const storedApiKey = window.localStorage.getItem(API_KEY_STORAGE_KEY) ?? '';
-        const storedBackendUrl =
-          window.localStorage.getItem(BACKEND_URL_STORAGE_KEY) ?? DEFAULT_BACKEND_URL;
         setApiKey(storedApiKey);
-        setBackendUrl(storedBackendUrl.replace(/\/+$/, ''));
       } catch {
         // ignore
       }
@@ -81,9 +58,8 @@ export function Options() {
 
     void (async () => {
       try {
-        const data = await readFromChrome();
-        setApiKey(data.apiKey);
-        setBackendUrl(data.backendUrl);
+        const key = await readApiKey();
+        setApiKey(key);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load settings.');
       }
@@ -98,10 +74,9 @@ export function Options() {
 
       try {
         if (usingChromeStorage) {
-          await writeToChrome(apiKey, backendUrl);
+          await writeApiKey(apiKey);
         } else {
           window.localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
-          window.localStorage.setItem(BACKEND_URL_STORAGE_KEY, backendUrl.replace(/\/+$/, ''));
         }
 
         setStatus('saved');
@@ -114,7 +89,7 @@ export function Options() {
         setStatus('error');
       }
     },
-    [apiKey, backendUrl, usingChromeStorage],
+    [apiKey, usingChromeStorage],
   );
 
   const saving = status === 'saving';
@@ -124,7 +99,7 @@ export function Options() {
       <div className="doc-options-card">
         <header className="doc-options-header">
           <h1>PageChat</h1>
-          <p>Configure how PageChat talks to your backend.</p>
+          <p>Enter your OpenAI API key to start chatting with any web page.</p>
         </header>
 
         <form className="doc-options-form" onSubmit={handleSave}>
@@ -138,21 +113,11 @@ export function Options() {
             />
           </label>
 
-          <label className="doc-options-field">
-            <span className="doc-options-label">Backend URL</span>
-            <input
-              type="url"
-              value={backendUrl}
-              onChange={(event) => setBackendUrl(event.target.value)}
-              placeholder={DEFAULT_BACKEND_URL}
-            />
-          </label>
-
           <div className="doc-options-footer">
             <button type="submit" disabled={saving}>
               {saving ? 'Saving…' : 'Save'}
             </button>
-            {status === 'saved' && <span className="doc-options-status doc-options-status--ok">Saved</span>}
+            {status === 'saved' && <span className="doc-options-status doc-options-status--ok">Saved ✓</span>}
             {error && <span className="doc-options-status doc-options-status--error">{error}</span>}
           </div>
         </form>
@@ -167,4 +132,3 @@ export function Options() {
     </div>
   );
 }
-

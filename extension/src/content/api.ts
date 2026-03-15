@@ -7,13 +7,11 @@ export interface ChatMessage {
 
 export interface StorageData {
   apiKey: string;
-  backendUrl: string;
 }
 
 const API_KEY_STORAGE_KEY = 'openai_api_key';
-const BACKEND_URL_STORAGE_KEY = 'backend_url';
 const HISTORY_KEY_PREFIX = 'doc_chat_history_';
-const DEFAULT_BACKEND_URL = 'http://127.0.0.1:8000';
+const BACKEND_URL = 'https://pagechat.onrender.com';
 
 export async function getStorage(): Promise<StorageData> {
   return new Promise((resolve, reject) => {
@@ -23,7 +21,7 @@ export async function getStorage(): Promise<StorageData> {
     }
 
     chrome.storage.local.get(
-      [API_KEY_STORAGE_KEY, BACKEND_URL_STORAGE_KEY],
+      [API_KEY_STORAGE_KEY],
       (items: Record<string, unknown>) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
@@ -31,12 +29,8 @@ export async function getStorage(): Promise<StorageData> {
         }
 
         const apiKey = (items[API_KEY_STORAGE_KEY] as string | undefined) ?? '';
-        const backendUrlRaw =
-          (items[BACKEND_URL_STORAGE_KEY] as string | undefined) ?? DEFAULT_BACKEND_URL;
 
-        const backendUrl = backendUrlRaw.replace(/\/+$/, '');
-
-        resolve({ apiKey, backendUrl });
+        resolve({ apiKey });
       },
     );
   });
@@ -53,11 +47,6 @@ export async function saveStorage(partial: Partial<StorageData>): Promise<void> 
 
     if (partial.apiKey !== undefined) {
       updates[API_KEY_STORAGE_KEY] = partial.apiKey;
-    }
-
-    if (partial.backendUrl !== undefined) {
-      const normalized = partial.backendUrl.replace(/\/+$/, '');
-      updates[BACKEND_URL_STORAGE_KEY] = normalized;
     }
 
     chrome.storage.local.set(updates, () => {
@@ -130,23 +119,18 @@ interface BackendChatResponse {
 }
 
 export async function sendChat(options: {
-  backendUrl: string;
   apiKey?: string;
   url: string;
   question: string;
   pageContent?: string;
 }): Promise<SendChatResult> {
-  const { backendUrl, apiKey, url, question, pageContent } = options;
-
-  if (!backendUrl) {
-    return { error: 'Backend URL is not configured.' };
-  }
+  const { apiKey, url, question, pageContent } = options;
 
   try {
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), 30_000);
 
-    const response = await fetch(`${backendUrl}/chat`, {
+    const response = await fetch(`${BACKEND_URL}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
