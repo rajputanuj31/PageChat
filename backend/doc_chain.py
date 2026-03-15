@@ -1,11 +1,8 @@
-import os
 from typing import Optional
 
 import certifi
+import requests
 from dotenv import load_dotenv
-
-os.environ.setdefault("SSL_CERT_FILE", certifi.where())
-os.environ.setdefault("REQUESTS_CA_BUNDLE", certifi.where())
 
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
@@ -36,7 +33,9 @@ def _format_docs(docs) -> str:
 
 
 def _build_chain(url: str, api_key: Optional[str] = None):
-    loader = WebBaseLoader(url)
+    session = requests.Session()
+    session.verify = certifi.where()
+    loader = WebBaseLoader(url, session=session)
     docs = loader.load()
 
     if not docs:
