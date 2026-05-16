@@ -1,12 +1,14 @@
 # PageChat
 
+![PageChat demo](extension/src/assets/demo.gif)
+
 Chat with any web page using OpenAI. PageChat injects a chat panel into every page you visit — ask questions, get summaries, and extract key points instantly.
 
 ---
 
 ## Installation
 
-1. Install the extension from the [Chrome Web Store](https://chrome.google.com/webstore).
+1. Install the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/pagechat/clkgpcmjodnbcapllcihbnaflcjapini).
 2. Click the PageChat panel that appears on any page.
 3. Click **"Open options"** and enter your **OpenAI API key** (`sk-...`).
 4. Start chatting.
