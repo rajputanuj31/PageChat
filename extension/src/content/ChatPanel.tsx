@@ -38,9 +38,8 @@ export function ChatPanel() {
   }, []);
 
   const openOptions = useCallback(() => {
-    if (typeof chrome === 'undefined' || !chrome.runtime?.getURL) return;
-    const optionsUrl = chrome.runtime.getURL('options.html');
-    window.open(optionsUrl, '_blank');
+    if (typeof chrome === 'undefined' || !chrome.runtime?.sendMessage) return;
+    chrome.runtime.sendMessage({ action: 'openOptions' });
   }, []);
 
   // Load settings on mount.

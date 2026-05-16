@@ -14,6 +14,7 @@ function stripCrossOrigin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), stripCrossOrigin()],
+  base: './',
   build: {
     emptyOutDir: true,
     rollupOptions: {
