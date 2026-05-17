@@ -83,8 +83,8 @@ export function Options() {
         setStatus('saved');
 
         window.setTimeout(() => {
-          setStatus('idle');
-        }, 1500);
+          window.close();
+        }, 800);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to save settings.');
         setStatus('error');

@@ -23,7 +23,7 @@ function getPageId(url: string): string {
 }
 
 export function ChatPanel() {
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
   const [url, setUrl] = useState<string>(getInitialUrl);
   const pageId = useMemo(() => getPageId(url), [url]);
 
@@ -42,7 +42,7 @@ export function ChatPanel() {
     chrome.runtime.sendMessage({ action: 'openOptions' });
   }, []);
 
-  // Load settings on mount.
+  // Load settings on mount and keep them in sync with storage changes.
   useEffect(() => {
     void (async () => {
       try {
@@ -52,6 +52,16 @@ export function ChatPanel() {
         setError(err instanceof Error ? err.message : 'Failed to load settings.');
       }
     })();
+
+    const onStorageChanged = (changes: Record<string, chrome.storage.StorageChange>) => {
+      if ('openai_api_key' in changes) {
+        setSettings({ apiKey: (changes['openai_api_key'].newValue as string) ?? '' });
+        setError(null);
+      }
+    };
+
+    chrome.storage.onChanged.addListener(onStorageChanged);
+    return () => chrome.storage.onChanged.removeListener(onStorageChanged);
   }, []);
 
   useEffect(() => {
@@ -89,8 +99,6 @@ export function ChatPanel() {
       }
     })();
 
-    // Always show the chat panel when we detect a new page.
-    setOpen(true);
   }, [pageId]);
 
   // Persist history when messages change.
