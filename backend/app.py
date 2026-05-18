@@ -1,10 +1,12 @@
+import asyncio
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, HttpUrl
 
-from doc_chain import answer_question
+from doc_chain import build_chain
 
 
 app = FastAPI(
@@ -27,24 +29,24 @@ class ChatRequest(BaseModel):
     api_key: Optional[str] = None
 
 
-class ChatResponse(BaseModel):
-    answer: str
+@app.post("/chat")
+async def chat(request: ChatRequest) -> StreamingResponse:
+    question = request.question.strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Question must not be empty.")
 
-
-@app.post("/chat", response_model=ChatResponse)
-def chat(request: ChatRequest) -> ChatResponse:
     try:
-        answer = answer_question(
-            url=str(request.url),
-            question=request.question,
-            api_key=request.api_key,
-        )
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        # _build_chain does sync network I/O (URL fetch + embeddings),
+        # so run it in a thread to avoid blocking the event loop.
+        chain = await asyncio.to_thread(build_chain, str(request.url), request.api_key)
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
-    return ChatResponse(answer=answer)
+    async def token_stream():
+        async for token in chain.astream(question):
+            yield token
+
+    return StreamingResponse(token_stream(), media_type="text/plain")
 
 
 @app.get("/health")

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import type { ChatMessage, StorageData } from './api';
 import { getStorage, loadHistory, saveHistory, sendChat } from './api';
 import { getPageContent } from './pageContent';
@@ -30,6 +31,7 @@ export function ChatPanel() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [settings, setSettings] = useState<StorageData | null>(null);
 
@@ -108,6 +110,11 @@ export function ChatPanel() {
     void saveHistory(pageId, messages);
   }, [messages, pageId]);
 
+  // Scroll to bottom on new messages and while streaming.
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInput(event.target.value);
@@ -130,7 +137,7 @@ export function ChatPanel() {
       setError(null);
 
       const userMessage: ChatMessage = { role: 'user', content: question };
-      setMessages((prev) => [...prev, userMessage]);
+      setMessages((prev) => [...prev, userMessage, { role: 'assistant', content: '' }]);
 
       const pageContent = getPageContent();
       const result = await sendChat({
@@ -138,13 +145,22 @@ export function ChatPanel() {
         url,
         question,
         pageContent,
+        onChunk: (chunk) => {
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              role: 'assistant',
+              content: updated[updated.length - 1].content + chunk,
+            };
+            return updated;
+          });
+          setLoading(false);
+        },
       });
 
       if (result.error) {
+        setMessages((prev) => prev.slice(0, -1));
         setError(result.error);
-      } else if (result.answer) {
-        const assistantMessage: ChatMessage = { role: 'assistant', content: result.answer };
-        setMessages((prev) => [...prev, assistantMessage]);
       }
 
       setLoading(false);
@@ -194,25 +210,35 @@ export function ChatPanel() {
                 </div>
               )}
 
-              {messages.map((message, index) => (
-                <div
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  className={`doc-chat-msg doc-chat-msg--${message.role}`}
-                >
-                  <span className="doc-chat-msg-label">
-                    {message.role === 'user' ? 'You' : 'AI'}
-                  </span>
-                  <div className="doc-chat-msg-content">{message.content}</div>
-                </div>
-              ))}
+              {messages.map((message, index) => {
+                const isAwaitingFirstToken =
+                  loading &&
+                  index === messages.length - 1 &&
+                  message.role === 'assistant' &&
+                  message.content === '';
+                return (
+                  <div
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    className={`doc-chat-msg doc-chat-msg--${message.role}`}
+                  >
+                    <span className="doc-chat-msg-label">
+                      {message.role === 'user' ? 'You' : 'AI'}
+                    </span>
+                    <div className="doc-chat-msg-content">
+                      {isAwaitingFirstToken ? (
+                        <span className="doc-chat-loading">Thinking...</span>
+                      ) : message.role === 'assistant' ? (
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                      ) : (
+                        message.content
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
 
-              {loading && (
-                <div className="doc-chat-msg doc-chat-msg--assistant">
-                  <span className="doc-chat-msg-label">AI</span>
-                  <div className="doc-chat-msg-content doc-chat-loading">Thinking...</div>
-                </div>
-              )}
+              <div ref={bottomRef} />
 
               {error && (
                 <div className="doc-chat-error">

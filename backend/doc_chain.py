@@ -32,7 +32,7 @@ def _format_docs(docs) -> str:
     return "\n\n".join(doc.page_content for doc in docs)
 
 
-def _build_chain(url: str, api_key: Optional[str] = None):
+def build_chain(url: str, api_key: Optional[str] = None):
     session = requests.Session()
     session.verify = certifi.where()
     loader = WebBaseLoader(url, session=session)
@@ -79,16 +79,11 @@ def _build_chain(url: str, api_key: Optional[str] = None):
         model=CHAT_MODEL,
         temperature=TEMPERATURE,
         api_key=api_key,
+        streaming=True,
     )
     parser = StrOutputParser()
 
     return parallel_chain | prompt | llm | parser
 
 
-def answer_question(url: str, question: str, api_key: Optional[str] = None) -> str:
-    if not question.strip():
-        raise ValueError("Question must not be empty.")
-
-    chain = _build_chain(url=url, api_key=api_key)
-    return chain.invoke(question)
 

@@ -110,12 +110,7 @@ export async function saveHistory(pageId: string, messages: ChatMessage[]): Prom
 }
 
 export interface SendChatResult {
-  answer?: string;
   error?: string;
-}
-
-interface BackendChatResponse {
-  answer: string;
 }
 
 export async function sendChat(options: {
@@ -123,12 +118,13 @@ export async function sendChat(options: {
   url: string;
   question: string;
   pageContent?: string;
+  onChunk: (chunk: string) => void;
 }): Promise<SendChatResult> {
-  const { apiKey, url, question, pageContent } = options;
+  const { apiKey, url, question, pageContent, onChunk } = options;
 
   try {
     const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 30_000);
+    const timeoutId = window.setTimeout(() => controller.abort(), 60_000);
 
     const response = await fetch(`${BACKEND_URL}/chat`, {
       method: 'POST',
@@ -139,7 +135,6 @@ export async function sendChat(options: {
         url,
         question,
         api_key: apiKey || undefined,
-        // In the current backend we ignore pageContent, but it is ready for future use.
         page_content: pageContent,
       }),
       signal: controller.signal,
@@ -151,17 +146,24 @@ export async function sendChat(options: {
       let detail = 'Request failed.';
       try {
         const data = (await response.json()) as { detail?: string };
-        if (data.detail) {
-          detail = data.detail;
-        }
+        if (data.detail) detail = data.detail;
       } catch {
         // ignore JSON parse errors
       }
       return { error: detail };
     }
 
-    const data = (await response.json()) as BackendChatResponse;
-    return { answer: data.answer };
+    const reader = response.body?.getReader();
+    if (!reader) return { error: 'No response body.' };
+
+    const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      onChunk(decoder.decode(value, { stream: true }));
+    }
+
+    return {};
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       return { error: 'Request timed out.' };

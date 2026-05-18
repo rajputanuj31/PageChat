@@ -112,10 +112,64 @@
   border-radius: 12px;
   padding: 8px 10px;
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 1.5;
   background: #f3f4f6;
   max-width: 100%;
   white-space: pre-wrap;
+}
+
+.doc-chat-msg--assistant .doc-chat-msg-content {
+  white-space: normal;
+}
+
+/* Markdown elements inside assistant bubbles */
+.doc-chat-msg--assistant .doc-chat-msg-content p {
+  margin: 0 0 6px;
+}
+.doc-chat-msg--assistant .doc-chat-msg-content p:last-child {
+  margin-bottom: 0;
+}
+.doc-chat-msg--assistant .doc-chat-msg-content ul,
+.doc-chat-msg--assistant .doc-chat-msg-content ol {
+  margin: 4px 0 6px;
+  padding-left: 18px;
+}
+.doc-chat-msg--assistant .doc-chat-msg-content li {
+  margin-bottom: 3px;
+}
+.doc-chat-msg--assistant .doc-chat-msg-content strong {
+  font-weight: 600;
+}
+.doc-chat-msg--assistant .doc-chat-msg-content em {
+  font-style: italic;
+}
+.doc-chat-msg--assistant .doc-chat-msg-content h1,
+.doc-chat-msg--assistant .doc-chat-msg-content h2,
+.doc-chat-msg--assistant .doc-chat-msg-content h3 {
+  font-weight: 600;
+  margin: 8px 0 4px;
+  line-height: 1.3;
+}
+.doc-chat-msg--assistant .doc-chat-msg-content h1 { font-size: 15px; }
+.doc-chat-msg--assistant .doc-chat-msg-content h2 { font-size: 14px; }
+.doc-chat-msg--assistant .doc-chat-msg-content h3 { font-size: 13px; }
+.doc-chat-msg--assistant .doc-chat-msg-content code {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.07);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+.doc-chat-msg--assistant .doc-chat-msg-content pre {
+  background: rgba(0, 0, 0, 0.07);
+  border-radius: 6px;
+  padding: 8px;
+  overflow-x: auto;
+  margin: 6px 0;
+}
+.doc-chat-msg--assistant .doc-chat-msg-content pre code {
+  background: none;
+  padding: 0;
 }
 
 .doc-chat-msg--user .doc-chat-msg-content {
