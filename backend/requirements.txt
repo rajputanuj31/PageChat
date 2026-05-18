@@ -8,4 +8,5 @@ faiss-cpu
 beautifulsoup4
 certifi
 requests
-
+pinecone
+langchain-pinecone
