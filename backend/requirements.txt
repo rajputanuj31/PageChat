@@ -10,3 +10,5 @@ certifi
 requests
 pinecone
 langchain-pinecone
+langchain-text-splitters
+PyYAML>=6.0.2
