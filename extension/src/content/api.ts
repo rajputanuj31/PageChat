@@ -158,25 +158,36 @@ export async function sendChat(options: {
 
     const decoder = new TextDecoder();
     let buffer = '';
-
+    
     while (true) {
       const { done, value } = await reader.read();
+    
       if (done) break;
-
+    
       buffer += decoder.decode(value, { stream: true });
-
-      // SSE events are delimited by double newlines.
-      // Hold any trailing incomplete event in the buffer.
-      const events = buffer.split('\n\n');
-      buffer = events.pop() ?? '';
-
-      for (const event of events) {
-        const line = event.trim();
-        if (line.startsWith('data: ')) {
+    
+      const lines = buffer.split('\n');
+    
+      buffer = lines.pop() || '';
+    
+      for (const line of lines) {
+        const trimmed = line.trim();
+    
+        if (!trimmed) continue;
+    
+        if (trimmed.startsWith('data:')) {
+          const data = trimmed.replace(/^data:\s*/, '');
+    
           try {
-            onChunk(JSON.parse(line.slice(6)) as string);
+            const parsed = JSON.parse(data);
+    
+            if (parsed) {
+              onChunk(parsed);
+            }
           } catch {
-            onChunk(line.slice(6));
+            if (data) {
+              onChunk(data);
+            }
           }
         }
       }
