@@ -157,10 +157,29 @@ export async function sendChat(options: {
     if (!reader) return { error: 'No response body.' };
 
     const decoder = new TextDecoder();
+    let buffer = '';
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      onChunk(decoder.decode(value, { stream: true }));
+
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE events are delimited by double newlines.
+      // Hold any trailing incomplete event in the buffer.
+      const events = buffer.split('\n\n');
+      buffer = events.pop() ?? '';
+
+      for (const event of events) {
+        const line = event.trim();
+        if (line.startsWith('data: ')) {
+          try {
+            onChunk(JSON.parse(line.slice(6)) as string);
+          } catch {
+            onChunk(line.slice(6));
+          }
+        }
+      }
     }
 
     return {};

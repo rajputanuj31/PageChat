@@ -1,4 +1,5 @@
 import asyncio
+import json
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
@@ -30,14 +31,12 @@ class ChatRequest(BaseModel):
     page_content: Optional[str] = None
 
 
-# Browsers buffer text/plain responses up to ~1445 bytes (MIME sniffing) before
-# rendering anything — making streaming appear broken. X-Content-Type-Options: nosniff
-# tells the browser to trust the declared Content-Type and skip sniffing, so tokens
-# are rendered immediately as they arrive.
-STREAMING_HEADERS = {
-    "X-Content-Type-Options": "nosniff",
-    "X-Accel-Buffering": "no",
+# text/event-stream (SSE) is recognized by every proxy as a live event stream
+# that must not be buffered — unlike text/plain which Render's proxy buffers in full.
+SSE_HEADERS = {
     "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+    "X-Accel-Buffering": "no",
 }
 
 
@@ -56,9 +55,9 @@ async def chat(request: ChatRequest) -> StreamingResponse:
 
     async def token_stream():
         async for token in chain.astream(question):
-            yield token
+            yield f"data: {json.dumps(token)}\n\n"
 
-    return StreamingResponse(token_stream(), media_type="text/plain", headers=STREAMING_HEADERS)
+    return StreamingResponse(token_stream(), media_type="text/event-stream", headers=SSE_HEADERS)
 
 
 @app.get("/health")
