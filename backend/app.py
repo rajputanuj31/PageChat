@@ -27,6 +27,15 @@ class ChatRequest(BaseModel):
     url: HttpUrl
     question: str
     api_key: Optional[str] = None
+    page_content: Optional[str] = None
+
+
+# Render (and many nginx-based hosts) buffer streaming responses by default.
+# X-Accel-Buffering: no disables that so tokens reach the client immediately.
+STREAMING_HEADERS = {
+    "X-Accel-Buffering": "no",
+    "Cache-Control": "no-cache",
+}
 
 
 @app.post("/chat")
@@ -36,7 +45,7 @@ async def chat(request: ChatRequest) -> StreamingResponse:
         raise HTTPException(status_code=400, detail="Question must not be empty.")
 
     try:
-        # _build_chain does sync network I/O (URL fetch + embeddings),
+        # build_chain does sync network I/O (URL fetch + embeddings),
         # so run it in a thread to avoid blocking the event loop.
         chain = await asyncio.to_thread(build_chain, str(request.url), request.api_key)
     except Exception as exc:  # noqa: BLE001
@@ -46,7 +55,7 @@ async def chat(request: ChatRequest) -> StreamingResponse:
         async for token in chain.astream(question):
             yield token
 
-    return StreamingResponse(token_stream(), media_type="text/plain")
+    return StreamingResponse(token_stream(), media_type="text/plain", headers=STREAMING_HEADERS)
 
 
 @app.get("/health")
