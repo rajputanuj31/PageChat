@@ -30,9 +30,12 @@ class ChatRequest(BaseModel):
     page_content: Optional[str] = None
 
 
-# Render (and many nginx-based hosts) buffer streaming responses by default.
-# X-Accel-Buffering: no disables that so tokens reach the client immediately.
+# Browsers buffer text/plain responses up to ~1445 bytes (MIME sniffing) before
+# rendering anything — making streaming appear broken. X-Content-Type-Options: nosniff
+# tells the browser to trust the declared Content-Type and skip sniffing, so tokens
+# are rendered immediately as they arrive.
 STREAMING_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
     "X-Accel-Buffering": "no",
     "Cache-Control": "no-cache",
 }
