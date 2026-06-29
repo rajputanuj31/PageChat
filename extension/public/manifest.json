@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "PageChat",
   "description": "Chat with any webpage using OpenAI. Summarize, ask questions, and get instant answers from any page.",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
@@ -11,19 +11,28 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage"],
-  "host_permissions": ["https://pagechat.onrender.com/*"],
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://anuj-pagechat.duckdns.org/*"
+  ],
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
   },
   "content_scripts": [
     {
-      "matches": ["*://*/*"],
-      "js": ["content.js"],
-      "css": ["content.css"],
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
       "run_at": "document_idle"
     }
   ]
 }
-

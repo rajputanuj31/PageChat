@@ -11,7 +11,7 @@ export interface StorageData {
 
 const API_KEY_STORAGE_KEY = 'openai_api_key';
 const HISTORY_KEY_PREFIX = 'doc_chat_history_';
-const BACKEND_URL = 'https://pagechat.onrender.com';
+const BACKEND_URL = 'https://anuj-pagechat.duckdns.org';
 
 export async function getStorage(): Promise<StorageData> {
   return new Promise((resolve, reject) => {
@@ -158,29 +158,29 @@ export async function sendChat(options: {
 
     const decoder = new TextDecoder();
     let buffer = '';
-    
+
     while (true) {
       const { done, value } = await reader.read();
-    
+
       if (done) break;
-    
+
       buffer += decoder.decode(value, { stream: true });
-    
+
       const lines = buffer.split('\n');
-    
+
       buffer = lines.pop() || '';
-    
+
       for (const line of lines) {
         const trimmed = line.trim();
-    
+
         if (!trimmed) continue;
-    
+
         if (trimmed.startsWith('data:')) {
           const data = trimmed.replace(/^data:\s*/, '');
-    
+
           try {
             const parsed = JSON.parse(data);
-    
+
             if (parsed) {
               onChunk(parsed);
             }
